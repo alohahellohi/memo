@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>memo</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#202631;background:#f7f8fb}*{box-sizing:border-box}body{margin:0}header{padding:32px max(20px,calc((100vw - 1100px)/2));background:#fff;border-bottom:1px solid #e7e9ee}h1{margin:0;font-size:clamp(25px,4vw,36px)}header p{color:#647084;margin:8px 0 0}main{max-width:1140px;margin:auto;padding:12px 20px 60px}section{margin-top:34px}h2{font-size:23px;margin:0 0 14px}.scroller{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:3px 2px 18px;scrollbar-color:#adb6c5 transparent}.video-card{flex:0 0 clamp(260px,72vw,360px);scroll-snap-align:start;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px #17213b12}.video-frame{aspect-ratio:4/5;background:#15191f;display:flex;align-items:center;justify-content:center}.video-frame video{width:100%;height:100%;display:block;object-fit:contain}.desc{padding:14px 16px;line-height:1.6;min-height:66px}.hint{font-size:13px;color:#657186;margin:0 0 12px}@media(min-width:800px){.video-card{flex-basis:340px}}
+
+/* Long text topic */
+.text-card{background:#fff;border-radius:14px;padding:20px;box-shadow:0 2px 12px #17213b12;max-width:100%;}
+.text-content{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.85;margin:0;}
+.text-content.collapsed{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;line-clamp:4;overflow:hidden;white-space:pre-wrap;}
+.toggle-text{margin-top:14px;border:1px solid #c9d3e1;background:#f4f7fb;border-radius:8px;padding:10px 16px;color:#253d59;font:inherit;cursor:pointer;}
+.toggle-text:hover{background:#e8eef7;}
+.source{font-size:13px;color:#777;margin-top:8px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere;}
+.video-frame iframe{width:100%;height:100%;border:0;display:block;}
+.source a{color:#1765b5;text-decoration:underline;overflow-wrap:anywhere;}
+.image-button{width:100%;height:100%;padding:0;border:0;background:transparent;cursor:zoom-in;display:block;}
+.image-button img{width:100%;height:100%;object-fit:contain;display:block;}
+#image-viewer{border:0;padding:0;background:transparent;max-width:96vw;max-height:94vh;overflow:visible;}
+#image-viewer::backdrop{background:rgba(0,0,0,.88);}
+#image-viewer img{display:block;max-width:94vw;max-height:85vh;object-fit:contain;}
+#image-close{position:absolute;right:0;top:0;transform:translateY(-100%);border:0;background:#fff;color:#222;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:20px;}
+</style>
+</head>
+<body>
+<header><h1>memo</h1><p>資料記錄</p></header>
+<main id="gallery"></main>
+<dialog id="image-viewer" aria-label="圖片放大預覽"><button id="image-close" type="button" aria-label="關閉">×</button><img id="image-preview" alt=""></dialog>
+<script>
+// 修改這裡即可新增主題、影片與說明。影片路徑相對於 index.html，例如 videos/video1.mp4。
+const topics = [
+ {title:'１號 竹北市長鄭朝方',
+  source:[
+    {text:'新竹選戰最前線',url:'https://www.youtube.com/live/v0J501wjYHc?si=uS3K_GvqgYVq4Syb'},
+    {text:'預備金燒光',url:'https://youtu.be/f8Idh1z9x7s?si=n544O9e8UJ4bHyjZ'},
+    {text:'破解鄭氏王朝',url:'https://www.youtube.com/live/x0qYVZi1sCo?si=PMOhtquZ6EtBQp57'}
+  ],
+  videos:[
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/clip1.mp4',description:'舞弊嚴重'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/clip2.mp4',description:'竹北市公所權力結構'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/clip4.mp4',description:'竹北經驗竹縣實現?無法接受'}
+ ]},
+ {title:'２號 立法委員徐欣瑩',source:[
+    {text:'無限支持徐欣瑩FB',url:'https://www.facebook.com/share/19s44b3SRf/'},
+    {text:'徐欣瑩FB',url:'https://www.facebook.com/share/1V8SnyndmD/'}
+  ],videos:[
+  {url:'https://www.youtube.com/watch?v=zzJsHxaThwY',description:'一首歌介紹徐欣瑩'},
+  {url:'https://www.youtube.com/watch?v=UYJ1lZoYdh0',description:'三分鐘認識徐欣瑩難扛能扛～縣長該做的事她已經在做 為大家做到'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t0.mp4',description:'初心與承諾'},
+ ]},
+ {title:'徐欣瑩政見',source:[
+  ],videos:[
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t1.mp4',description:'政見發表part1:貼心福利x前瞻教育(3分鐘重點)'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t2.mp4',description:'政見發表part2:智慧交通x友善科技(3分鐘重點)'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t3.mp4',description:'政見發表part3:優質生活x魅力觀光(2分鐘重點)'},
+ ]},
+ {title:'超級比一比',source:[
+  ],videos:[
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/fire1.jpg',description:'眾所推薦'},
+  {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/fire2.jpg',description:'超級比一比'},
+ ]},
+ {title:'選情事件',source:[
+    {text:'無限支持徐欣瑩FB',url:'https://www.facebook.com/share/19s44b3SRf/'},
+    {text:'徐欣瑩FB',url:'https://www.facebook.com/share/1V8SnyndmD/'}
+  ],videos:[
+  {url:'https://www.youtube.com/watch?v=9chherJPeCg',description:'徐欣瑩助理遭扣押,司法暴力'},
+  {url:'https://youtube.com/shorts/6MYOzzwCbLY',description:'受害的助理李小姐AI重現'},
+  {url:'https://youtube.com/shorts/fO0sImBIMO8',description:'壓不扁的油桐花 行動開始！'}
+ ]},
+ // 範例文字區塊：請將下方標題及內容換成你自己的文字。
+ {
+    title: '徐欣瑩小助理案｜七個問題看懂始末',
+    type: 'text',
+    content: `徐欣瑩小助理案｜七個問題看懂始末
+
+① 為什麼欣瑩要絕食？
+
+如果欣瑩沒有採取絕食抗議，小助理當晚就不會獲釋。可能會像派報的老闆一樣，至今仍被收押禁見。就如同，羅智強說「小助理可能就完蛋了！」
+
+② 欣瑩在堅持什麼？
+
+事實上，第一時間徐欣瑩收到這件事，居然是透過鏡周刊的抹黑新聞才知道的細節，新聞惡意在未定罪的情況下直接把當事人的名字公布。指稱就是該助理製作影片。
+更誇張的是，與本案完全無關的競選團隊成員電腦、手機、硬碟全數被檢調扣走。
+司法成為民進黨鄭朝方的工具，拿來竊取對手情資、癱瘓宣傳團隊。
+所以徐欣瑩當然要站出來守護團隊！
+
+③ 二十多歲的助理，原本要請律師，為什麼最後在沒有律師陪同下做完警詢筆錄？
+
+大家想想，偵訊人員一定是經驗豐富，那麼一個 20 多歲的年輕女生，剛出社會沒有多久；在沒有律師陪同的情況下，就如同電影演的那樣，面對偵訊手段，她真的承受的了嗎?
+尤其當原本小助理有要求律師，最後卻突然說不用了。這中間是不是發生一些事，是不是被威脅，或是被不當的誘導，甚至被惡意的恐嚇？才導致小助理不請律師了。
+當警檢體系還是民進黨鄭朝方的打手，他們一定試圖將寫好的劇本，透用在小助理身上，以抹黑徐欣瑩。
+在這樣情況下，偵訊的過程，寫下的筆錄，是否可信?
+檢警方是否有可公開偵訊過程還原真相 !
+
+④小助理目前狀況
+
+她回到家後，仍擔心自己被跟蹤、被監聽，食慾不振，也非常害怕再度面對檢調那樣惡劣、兇狠的態度。所以至今不敢出門與外界接觸，只能由親友持續陪伴。
+
+⑤ 為什麼說這是一起選舉事件？
+
+選前 8 天，鄭朝方、曾聖凱在選情上都明顯落後。這個時候，大家覺得什麼手段能讓他們翻盤？
+就是透過抹黑、造謠，又取得徐欣瑩團隊的 4 台選務電腦和 4 支手機，藉此癱瘓她的競選團隊。
+而既然曾聖凱可以透過檢警取得第一手資料發布新聞，鄭朝方是否也可以拿到對手徐欣瑩選務資料？
+
+⑥ 偵辦過程的瑕疵在哪裡？
+
+偵查人員很有可能是否利用助理不熟悉法律程序，在過程中用了不少小手段。
+小助理頂多只是轉傳給朋友看看熱鬧，根本沒有「意圖使人不當選」如此嚴重。
+連爆料者都聲明，自己波及無辜。那麼小助理怎麼可能製作抹黃影片？
+
+⑦ 面對「辦藍不辦綠」，我們能做什麼？
+
+民進黨一再以類似的偵辦手段打壓在野黨。
+以柯文哲案為例，遲遲無法定罪，卻能透過偵辦拖累當事人，再搭配媒體操作，彷彿一切都照著早已寫好的劇本走….
+羅智強說，他們最怕監督制衡的人有決心、有勇氣，讓他們知道我們不會屈服。
+人民用手中的選票制裁他們，他們才會往後退。
+目前，欣瑩仍在醫院接受檢查。選前 4 天，我們更需要人民一起站出來，對抗不尊重人民的政府。
+11/28，請用手中的選票，還人民一個公道！`
+  }
+];
+const gallery = document.getElementById('gallery');
+const viewer = document.getElementById('image-viewer');
+const preview = document.getElementById('image-preview');
+document.getElementById('image-close').addEventListener('click', () => viewer.close());
+viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
+function appendSource(section, topic) {
+  if (!topic.source) return;
+  const source = document.createElement('div');
+  source.className = 'source';
+  if (Array.isArray(topic.source)) {
+    if (!topic.source.length) return;
+    source.append(document.createTextNode('資料來源：'));
+    for (const item of topic.source) {
+      source.append(document.createTextNode('\n'));
+      if (item.url && /^https?:\/\//i.test(item.url)) {
+        const link = document.createElement('a');
+        link.href = item.url;
+        link.textContent = item.text || item.url;
+        link.target = '_blank';
+        link.rel = 'noopener noreferrer';
+        source.append(link);
+      } else {
+        source.append(document.createTextNode(item.text || ''));
+      }
+    }
+    section.append(source);
+    return;
+  }
+  const value = '資料來源：' + topic.source;
+  const pattern = /https?:\/\/[^\s<>"'，。；、）】]+/gi;
+  let last = 0;
+  for (const match of value.matchAll(pattern)) {
+    source.append(document.createTextNode(value.slice(last, match.index)));
+    const link = document.createElement('a');
+    link.href = match[0];
+    link.textContent = match[0];
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    source.append(link);
+    last = match.index + match[0].length;
+  }
+  source.append(document.createTextNode(value.slice(last)));
+  section.append(source);
+}
+for (const topic of topics) {
+  const section = document.createElement('section');
+  const title = document.createElement('h2');
+  title.textContent = topic.title;
+  section.append(title);
+
+  if (topic.type === 'text') {
+    const card = document.createElement('article');
+    card.className = 'text-card';
+    const content = document.createElement('div');
+    content.className = 'text-content collapsed';
+    content.textContent = topic.content || '';
+    card.append(content);
+    const toggle = document.createElement('button');
+    toggle.className = 'toggle-text';
+    toggle.type = 'button';
+    toggle.textContent = '展開全文 ▼';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.addEventListener('click', () => {
+      const expanded = content.classList.toggle('collapsed') === false;
+      toggle.textContent = expanded ? '收合內容 ▲' : '展開全文 ▼';
+      toggle.setAttribute('aria-expanded', String(expanded));
+    });
+    card.append(toggle);
+    section.append(card);
+    appendSource(section, topic);
+    gallery.append(section);
+    // Only show the toggle if text actually overflows four lines.
+    requestAnimationFrame(() => {
+      toggle.hidden = content.scrollHeight <= content.clientHeight + 2;
+    });
+    continue;
+  }
+
+  if (!Array.isArray(topic.videos)) continue;
+  const hint = document.createElement('p');
+  hint.className = 'hint';
+  hint.textContent = '← 左右滑動，查看更多影片 →';
+  section.append(hint);
+  const scroller = document.createElement('div');
+  scroller.className = 'scroller';
+  for (const item of topic.videos) {
+    const card = document.createElement('article');
+    card.className = 'video-card';
+    const frame = document.createElement('div');
+    frame.className = 'video-frame';
+    const yt = item.url.match(/^https?:\/\/(?:(?:www\.|m\.)?youtube\.com\/(?:watch\?(?:[^#]*&)?v=|shorts\/|live\/|embed\/)|youtu\.be\/)([\w-]{11})(?=$|[?&#/])/i);
+    if (item.type === 'image' || /\.(jpe?g|png|webp|gif|avif|bmp|svg)(?:[?#].*)?$/i.test(item.url)) {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'image-button';
+      button.setAttribute('aria-label', '放大圖片：' + (item.description || '圖片'));
+      const img = document.createElement('img');
+      img.src = item.url;
+      img.alt = item.description || '圖片';
+      img.loading = 'lazy';
+      button.append(img);
+      button.addEventListener('click', () => {
+        preview.src = item.url;
+        preview.alt = img.alt;
+        viewer.showModal();
+      });
+      frame.append(button);
+    } else if (yt) {
+      const iframe = document.createElement('iframe');
+      iframe.src = 'https://www.youtube-nocookie.com/embed/' + yt[1];
+      iframe.title = item.description || 'YouTube';
+      iframe.loading = 'lazy';
+      iframe.allow = 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share';
+      iframe.allowFullscreen = true;
+      frame.append(iframe);
+    } else if (/\.(mp4|webm|ogg)(?:[?#].*)?$/i.test(item.url)) {
+      const video = document.createElement('video');
+      video.src = item.url;
+      video.controls = true;
+      video.preload = 'metadata';
+      video.playsInline = true;
+      video.setAttribute('aria-label', item.description || '影片');
+      frame.append(video);
+    } else {
+      const note = document.createElement('p');
+      note.textContent = '請確認影片或圖片路徑與格式';
+      note.style = 'color:white;padding:20px';
+      frame.append(note);
+    }
+    const desc = document.createElement('div');
+    desc.className = 'desc';
+    desc.textContent = item.description || '';
+    card.append(frame, desc);
+    scroller.append(card);
+  }
+  section.append(scroller);
+  appendSource(section, topic);
+  gallery.append(section);
+}
+</script>
+</body></html>
