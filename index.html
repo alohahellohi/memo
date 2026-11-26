@@ -2,7 +2,14 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>memo</title>
+<title>新竹縣長選舉資料整理</title>
+<meta property="og:title" content="新竹縣長選舉資料整理">
+<meta property="og:description" content="候選人介紹、政見、影片與相關資料。">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://alohahellohi.github.io/memo/">
+<meta property="og:image" content="https://alohahellohi.github.io/memo/cover.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
 <style>
 :root{font-family:system-ui,-apple-system,"Noto Sans TC",sans-serif;color:#202631;background:#f7f8fb}*{box-sizing:border-box}body{margin:0}header{padding:32px max(20px,calc((100vw - 1100px)/2));background:#fff;border-bottom:1px solid #e7e9ee}h1{margin:0;font-size:clamp(25px,4vw,36px)}header p{color:#647084;margin:8px 0 0}main{max-width:1140px;margin:auto;padding:12px 20px 60px}section{margin-top:34px}h2{font-size:23px;margin:0 0 14px}.scroller{display:flex;gap:18px;overflow-x:auto;scroll-snap-type:x mandatory;padding:3px 2px 18px;scrollbar-color:#adb6c5 transparent}.video-card{flex:0 0 clamp(260px,72vw,360px);scroll-snap-align:start;background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 12px #17213b12}.video-frame{aspect-ratio:4/5;background:#15191f;display:flex;align-items:center;justify-content:center}.video-frame video{width:100%;height:100%;display:block;object-fit:contain}.desc{padding:14px 16px;line-height:1.6;min-height:66px}.hint{font-size:13px;color:#657186;margin:0 0 12px}@media(min-width:800px){.video-card{flex-basis:340px}}
 
@@ -21,6 +28,7 @@
 #image-viewer::backdrop{background:rgba(0,0,0,.88);}
 #image-viewer img{display:block;max-width:94vw;max-height:85vh;object-fit:contain;}
 #image-close{position:absolute;right:0;top:0;transform:translateY(-100%);border:0;background:#fff;color:#222;border-radius:6px;padding:6px 12px;cursor:pointer;font-size:20px;}
+.topic-summary{background:#f0f3f8;border-radius:10px;padding:14px 16px;margin:4px 0 12px;}
 </style>
 </head>
 <body>
@@ -31,6 +39,7 @@
 // 修改這裡即可新增主題、影片與說明。影片路徑相對於 index.html，例如 videos/video1.mp4。
 const topics = [
  {title:'１號 竹北市長鄭朝方',
+  summary:``,
   source:[
     {text:'新竹選戰最前線',url:'https://www.youtube.com/live/v0J501wjYHc?si=uS3K_GvqgYVq4Syb'},
     {text:'預備金燒光',url:'https://youtu.be/f8Idh1z9x7s?si=n544O9e8UJ4bHyjZ'},
@@ -41,7 +50,9 @@ const topics = [
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/clip2.mp4',description:'竹北市公所權力結構'},
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/clip4.mp4',description:'竹北經驗竹縣實現?無法接受'}
  ]},
- {title:'２號 立法委員徐欣瑩',source:[
+ {title:'２號 立法委員徐欣瑩',
+  summary:``,
+  source:[
     {text:'無限支持徐欣瑩FB',url:'https://www.facebook.com/share/19s44b3SRf/'},
     {text:'徐欣瑩FB',url:'https://www.facebook.com/share/1V8SnyndmD/'}
   ],videos:[
@@ -49,24 +60,32 @@ const topics = [
   {url:'https://www.youtube.com/watch?v=UYJ1lZoYdh0',description:'三分鐘認識徐欣瑩難扛能扛～縣長該做的事她已經在做 為大家做到'},
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t0.mp4',description:'初心與承諾'},
  ]},
- {title:'徐欣瑩政見',source:[{text:'徐欣瑩官網',url:'https://www.shesinging.tw/'}
+ {title:'徐欣瑩政見',
+  summary:``,
+  source:[{text:'徐欣瑩官網',url:'https://www.shesinging.tw/'}
   ],videos:[
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t1.mp4',description:'政見發表part1:貼心福利x前瞻教育(3分鐘重點)'},
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t2.mp4',description:'政見發表part2:智慧交通x友善科技(3分鐘重點)'},
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/she_t3.mp4',description:'政見發表part3:優質生活x魅力觀光(2分鐘重點)'},
  ]},
- {title:'徐欣瑩重大政績',source:[{text:'徐欣瑩youtube',url:'https://www.youtube.com/@shesingingmv'},{text:'徐欣瑩官網',url:'https://www.shesinging.tw/'}
+ {title:'徐欣瑩重大政績',
+  summary:``,
+  source:[{text:'徐欣瑩youtube',url:'https://www.youtube.com/@shesingingmv'},{text:'徐欣瑩官網',url:'https://www.shesinging.tw/'}
   ],videos:[
   {url:'https://youtube.com/shorts/doataDgiNMg?si=WBbqEmeWf-KEhUP6',description:'台大醫院(3min)'},
   {url:'https://youtube.com/shorts/26KrC37drTk?si=kDCtkWTE8sjyMCZ4',description:'自來水普及(3min)'},
   {url:'https://youtube.com/shorts/YXig29574lI?si=kFhyUceQiOkX6zKL',description:'交通～從路平到暢通(1min)'},
  ]},
- {title:'超級比一比',source:[
+ {title:'超級比一比',
+  summary:``,
+  source:[
   ],videos:[
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/fire1.jpg',description:'眾所推薦'},
   {url:'https://pub-332b6bf778d9416e9fe792b0d776395f.r2.dev/fire2.jpg',description:'超級比一比'},
  ]},
- {title:'選情事件',source:[
+ {title:'選情事件',
+  summary:``,
+  source:[
     {text:'無限支持徐欣瑩FB',url:'https://www.facebook.com/share/19s44b3SRf/'},
     {text:'徐欣瑩FB',url:'https://www.facebook.com/share/1V8SnyndmD/'}
   ],videos:[
@@ -130,6 +149,34 @@ const viewer = document.getElementById('image-viewer');
 const preview = document.getElementById('image-preview');
 document.getElementById('image-close').addEventListener('click', () => viewer.close());
 viewer.addEventListener('click', event => { if (event.target === viewer) viewer.close(); });
+function appendSummary(section, topic) {
+  if (typeof topic.summary !== 'string' || !topic.summary.trim()) return;
+  const card = document.createElement('div');
+  card.className = 'topic-summary';
+  const content = document.createElement('div');
+  content.className = 'text-content collapsed';
+  content.textContent = topic.summary;
+  const toggle = document.createElement('button');
+  toggle.type = 'button';
+  toggle.className = 'toggle-text';
+  toggle.textContent = '展開全文 ▼';
+  toggle.setAttribute('aria-expanded', 'false');
+  toggle.hidden = true;
+  toggle.addEventListener('click', () => {
+    const expanded = !content.classList.toggle('collapsed');
+    toggle.textContent = expanded ? '收合內容 ▲' : '展開全文 ▼';
+    toggle.setAttribute('aria-expanded', String(expanded));
+  });
+  card.append(content, toggle);
+  section.append(card);
+  function updateToggle() {
+    if (content.classList.contains('collapsed')) {
+      toggle.hidden = content.scrollHeight <= content.clientHeight + 2;
+    }
+  }
+  requestAnimationFrame(updateToggle);
+  window.addEventListener('resize', updateToggle);
+}
 function appendSource(section, topic) {
   if (!topic.source) return;
   const source = document.createElement('div');
@@ -261,6 +308,7 @@ for (const topic of topics) {
     scroller.append(card);
   }
   section.append(scroller);
+  appendSummary(section, topic);
   appendSource(section, topic);
   gallery.append(section);
 }
